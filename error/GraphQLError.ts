@@ -116,6 +116,7 @@ export class GraphQLError extends Error {
    */
 
   readonly extensions: GraphQLErrorExtensions;
+  constructor(message: string, args?: GraphQLErrorArgs);
   /**
    * @deprecated Please use the `GraphQLErrorArgs` constructor overload instead.
    */
@@ -133,7 +134,6 @@ export class GraphQLError extends Error {
     >,
     extensions?: Maybe<GraphQLErrorExtensions>,
   );
-  constructor(message: string, args?: GraphQLErrorArgs);
 
   constructor(message: string, ...rawArgs: BackwardsCompatibleArgs) {
     const { nodes, source, positions, path, originalError, extensions } =
@@ -306,7 +306,7 @@ export function printError(error: GraphQLError): string {
  * Given a GraphQLError, format it according to the rules described by the
  * Response Format, Errors section of the GraphQL Specification.
  *
- * @deprecated Please use `error.toString` instead. Will be removed in v17
+ * @deprecated Please use `error.toJSON` instead. Will be removed in v17
  */
 
 export function formatError(error: GraphQLError): GraphQLFormattedError {
