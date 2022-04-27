@@ -66,7 +66,9 @@ function OverlappingFieldsCanBeMergedRule(context) {
         context.reportError(
           new _GraphQLError.GraphQLError(
             `Fields "${responseName}" conflict because ${reasonMsg}. Use different aliases on the fields to fetch both if this was intentional.`,
-            fields1.concat(fields2),
+            {
+              nodes: fields1.concat(fields2),
+            },
           ),
         );
       }
@@ -587,15 +589,10 @@ function findConflict(
 }
 
 function stringifyArguments(fieldNode) {
-  var _fieldNode$arguments;
-
   // FIXME https://github.com/graphql/graphql-js/issues/2203
   const args =
     /* c8 ignore next */
-    (_fieldNode$arguments = fieldNode.arguments) !== null &&
-    _fieldNode$arguments !== void 0
-      ? _fieldNode$arguments
-      : [];
+    fieldNode.arguments ?? [];
   const inputObjectWithArgs = {
     kind: _kinds.Kind.OBJECT,
     fields: args.map((argNode) => ({

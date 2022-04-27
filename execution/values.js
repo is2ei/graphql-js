@@ -85,7 +85,9 @@ function coerceVariableValues(schema, varDefNodes, inputs, onError) {
       onError(
         new _GraphQLError.GraphQLError(
           `Variable "$${varName}" expected value of type "${varTypeStr}" which cannot be used as an input type.`,
-          varDefNode.type,
+          {
+            nodes: varDefNode.type,
+          },
         ),
       );
       continue;
@@ -102,7 +104,9 @@ function coerceVariableValues(schema, varDefNodes, inputs, onError) {
         onError(
           new _GraphQLError.GraphQLError(
             `Variable "$${varName}" of required type "${varTypeStr}" was not provided.`,
-            varDefNode,
+            {
+              nodes: varDefNode,
+            },
           ),
         );
       }
@@ -117,7 +121,9 @@ function coerceVariableValues(schema, varDefNodes, inputs, onError) {
       onError(
         new _GraphQLError.GraphQLError(
           `Variable "$${varName}" of non-null type "${varTypeStr}" must not be null.`,
-          varDefNode,
+          {
+            nodes: varDefNode,
+          },
         ),
       );
       continue;
@@ -138,14 +144,10 @@ function coerceVariableValues(schema, varDefNodes, inputs, onError) {
         }
 
         onError(
-          new _GraphQLError.GraphQLError(
-            prefix + '; ' + error.message,
-            varDefNode,
-            undefined,
-            undefined,
-            undefined,
-            error.originalError,
-          ),
+          new _GraphQLError.GraphQLError(prefix + '; ' + error.message, {
+            nodes: varDefNode,
+            originalError: error.originalError,
+          }),
         );
       },
     );
@@ -163,16 +165,11 @@ function coerceVariableValues(schema, varDefNodes, inputs, onError) {
  */
 
 function getArgumentValues(def, node, variableValues) {
-  var _node$arguments;
-
   const coercedValues = {}; // FIXME: https://github.com/graphql/graphql-js/issues/2203
 
   /* c8 ignore next */
 
-  const argumentNodes =
-    (_node$arguments = node.arguments) !== null && _node$arguments !== void 0
-      ? _node$arguments
-      : [];
+  const argumentNodes = node.arguments ?? [];
   const argNodeMap = (0, _keyMap.keyMap)(
     argumentNodes,
     (arg) => arg.name.value,
@@ -191,7 +188,9 @@ function getArgumentValues(def, node, variableValues) {
           `Argument "${name}" of required type "${(0, _inspect.inspect)(
             argType,
           )}" ` + 'was not provided.',
-          node,
+          {
+            nodes: node,
+          },
         );
       }
 
@@ -216,7 +215,9 @@ function getArgumentValues(def, node, variableValues) {
               argType,
             )}" ` +
               `was provided the variable "$${variableName}" which was not provided a runtime value.`,
-            valueNode,
+            {
+              nodes: valueNode,
+            },
           );
         }
 
@@ -231,7 +232,9 @@ function getArgumentValues(def, node, variableValues) {
         `Argument "${name}" of non-null type "${(0, _inspect.inspect)(
           argType,
         )}" ` + 'must not be null.',
-        valueNode,
+        {
+          nodes: valueNode,
+        },
       );
     }
 
@@ -249,7 +252,9 @@ function getArgumentValues(def, node, variableValues) {
         `Argument "${name}" has invalid value ${(0, _printer.print)(
           valueNode,
         )}.`,
-        valueNode,
+        {
+          nodes: valueNode,
+        },
       );
     }
 

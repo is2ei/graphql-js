@@ -51,7 +51,9 @@ function FieldsOnCorrectTypeRule(context) {
             new _GraphQLError.GraphQLError(
               `Cannot query field "${fieldName}" on type "${type.name}".` +
                 suggestion,
-              node,
+              {
+                nodes: node,
+              },
             ),
           );
         }
@@ -83,18 +85,13 @@ function getSuggestedTypeNames(schema, type, fieldName) {
     usageCount[possibleType.name] = 1;
 
     for (const possibleInterface of possibleType.getInterfaces()) {
-      var _usageCount$possibleI;
-
       if (!possibleInterface.getFields()[fieldName]) {
         continue;
       } // This interface type defines this field.
 
       suggestedTypes.add(possibleInterface);
       usageCount[possibleInterface.name] =
-        ((_usageCount$possibleI = usageCount[possibleInterface.name]) !==
-          null && _usageCount$possibleI !== void 0
-          ? _usageCount$possibleI
-          : 0) + 1;
+        (usageCount[possibleInterface.name] ?? 0) + 1;
     }
   }
 

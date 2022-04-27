@@ -16,8 +16,6 @@ export function UniqueEnumValueNamesRule(context) {
   };
 
   function checkValueUniqueness(node) {
-    var _node$values;
-
     const typeName = node.name.value;
 
     if (!knownValueNames[typeName]) {
@@ -26,10 +24,7 @@ export function UniqueEnumValueNamesRule(context) {
 
     /* c8 ignore next */
 
-    const valueNodes =
-      (_node$values = node.values) !== null && _node$values !== void 0
-        ? _node$values
-        : [];
+    const valueNodes = node.values ?? [];
     const valueNames = knownValueNames[typeName];
 
     for (const valueDef of valueNodes) {
@@ -40,14 +35,18 @@ export function UniqueEnumValueNamesRule(context) {
         context.reportError(
           new GraphQLError(
             `Enum value "${typeName}.${valueName}" already exists in the schema. It cannot also be defined in this type extension.`,
-            valueDef.name,
+            {
+              nodes: valueDef.name,
+            },
           ),
         );
       } else if (valueNames[valueName]) {
         context.reportError(
           new GraphQLError(
             `Enum value "${typeName}.${valueName}" can only be defined once.`,
-            [valueNames[valueName], valueDef.name],
+            {
+              nodes: [valueNames[valueName], valueDef.name],
+            },
           ),
         );
       } else {

@@ -15,24 +15,19 @@ var _GraphQLError = require('./GraphQLError.js');
  * document responsible for the original Error.
  */
 function locatedError(rawOriginalError, nodes, path) {
-  var _nodes;
-
   const originalError = (0, _toError.toError)(rawOriginalError); // Note: this uses a brand-check to support GraphQL errors originating from other contexts.
 
   if (isLocatedGraphQLError(originalError)) {
     return originalError;
   }
 
-  return new _GraphQLError.GraphQLError(
-    originalError.message,
-    (_nodes = originalError.nodes) !== null && _nodes !== void 0
-      ? _nodes
-      : nodes,
-    originalError.source,
-    originalError.positions,
+  return new _GraphQLError.GraphQLError(originalError.message, {
+    nodes: originalError.nodes ?? nodes,
+    source: originalError.source,
+    positions: originalError.positions,
     path,
     originalError,
-  );
+  });
 }
 
 function isLocatedGraphQLError(error) {

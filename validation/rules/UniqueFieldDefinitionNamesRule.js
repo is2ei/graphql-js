@@ -28,8 +28,6 @@ function UniqueFieldDefinitionNamesRule(context) {
   };
 
   function checkFieldUniqueness(node) {
-    var _node$fields;
-
     const typeName = node.name.value;
 
     if (!knownFieldNames[typeName]) {
@@ -38,10 +36,7 @@ function UniqueFieldDefinitionNamesRule(context) {
 
     /* c8 ignore next */
 
-    const fieldNodes =
-      (_node$fields = node.fields) !== null && _node$fields !== void 0
-        ? _node$fields
-        : [];
+    const fieldNodes = node.fields ?? [];
     const fieldNames = knownFieldNames[typeName];
 
     for (const fieldDef of fieldNodes) {
@@ -51,14 +46,18 @@ function UniqueFieldDefinitionNamesRule(context) {
         context.reportError(
           new _GraphQLError.GraphQLError(
             `Field "${typeName}.${fieldName}" already exists in the schema. It cannot also be defined in this type extension.`,
-            fieldDef.name,
+            {
+              nodes: fieldDef.name,
+            },
           ),
         );
       } else if (fieldNames[fieldName]) {
         context.reportError(
           new _GraphQLError.GraphQLError(
             `Field "${typeName}.${fieldName}" can only be defined once.`,
-            [fieldNames[fieldName], fieldDef.name],
+            {
+              nodes: [fieldNames[fieldName], fieldDef.name],
+            },
           ),
         );
       } else {

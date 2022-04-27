@@ -16,16 +16,10 @@ export function UniqueArgumentNamesRule(context) {
   };
 
   function checkArgUniqueness(parentNode) {
-    var _parentNode$arguments;
-
     // FIXME: https://github.com/graphql/graphql-js/issues/2203
 
     /* c8 ignore next */
-    const argumentNodes =
-      (_parentNode$arguments = parentNode.arguments) !== null &&
-      _parentNode$arguments !== void 0
-        ? _parentNode$arguments
-        : [];
+    const argumentNodes = parentNode.arguments ?? [];
     const seenArgs = groupBy(argumentNodes, (arg) => arg.name.value);
 
     for (const [argName, argNodes] of seenArgs) {
@@ -33,7 +27,9 @@ export function UniqueArgumentNamesRule(context) {
         context.reportError(
           new GraphQLError(
             `There can be only one argument named "${argName}".`,
-            argNodes.map((node) => node.name),
+            {
+              nodes: argNodes.map((node) => node.name),
+            },
           ),
         );
       }

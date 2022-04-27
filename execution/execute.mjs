@@ -195,7 +195,7 @@ export function assertValidExecutionArguments(
  */
 
 export function buildExecutionContext(args) {
-  var _definition$name, _operation$variableDe;
+  var _definition$name;
 
   const {
     schema,
@@ -253,17 +253,11 @@ export function buildExecutionContext(args) {
 
   /* c8 ignore next */
 
-  const variableDefinitions =
-    (_operation$variableDe = operation.variableDefinitions) !== null &&
-    _operation$variableDe !== void 0
-      ? _operation$variableDe
-      : [];
+  const variableDefinitions = operation.variableDefinitions ?? [];
   const coercedVariableValues = getVariableValues(
     schema,
     variableDefinitions,
-    rawVariableValues !== null && rawVariableValues !== void 0
-      ? rawVariableValues
-      : {},
+    rawVariableValues ?? {},
     {
       maxErrors: 50,
     },
@@ -280,18 +274,9 @@ export function buildExecutionContext(args) {
     contextValue,
     operation,
     variableValues: coercedVariableValues.coerced,
-    fieldResolver:
-      fieldResolver !== null && fieldResolver !== void 0
-        ? fieldResolver
-        : defaultFieldResolver,
-    typeResolver:
-      typeResolver !== null && typeResolver !== void 0
-        ? typeResolver
-        : defaultTypeResolver,
-    subscribeFieldResolver:
-      subscribeFieldResolver !== null && subscribeFieldResolver !== void 0
-        ? subscribeFieldResolver
-        : defaultFieldResolver,
+    fieldResolver: fieldResolver ?? defaultFieldResolver,
+    typeResolver: typeResolver ?? defaultTypeResolver,
+    subscribeFieldResolver: subscribeFieldResolver ?? defaultFieldResolver,
     errors: [],
   };
 }
@@ -305,7 +290,9 @@ function executeOperation(exeContext, operation, rootValue) {
   if (rootType == null) {
     throw new GraphQLError(
       `Schema is not configured to execute ${operation.operation} operation.`,
-      operation,
+      {
+        nodes: operation,
+      },
     );
   }
 
@@ -422,8 +409,6 @@ function executeFields(exeContext, parentType, sourceValue, path, fields) {
  */
 
 function executeField(exeContext, parentType, source, fieldNodes, path) {
-  var _fieldDef$resolve;
-
   const fieldDef = getFieldDef(exeContext.schema, parentType, fieldNodes[0]);
 
   if (!fieldDef) {
@@ -431,11 +416,7 @@ function executeField(exeContext, parentType, source, fieldNodes, path) {
   }
 
   const returnType = fieldDef.type;
-  const resolveFn =
-    (_fieldDef$resolve = fieldDef.resolve) !== null &&
-    _fieldDef$resolve !== void 0
-      ? _fieldDef$resolve
-      : exeContext.fieldResolver;
+  const resolveFn = fieldDef.resolve ?? exeContext.fieldResolver;
   const info = buildResolveInfo(
     exeContext,
     fieldDef,
@@ -731,13 +712,7 @@ function completeAbstractValue(
   path,
   result,
 ) {
-  var _returnType$resolveTy;
-
-  const resolveTypeFn =
-    (_returnType$resolveTy = returnType.resolveType) !== null &&
-    _returnType$resolveTy !== void 0
-      ? _returnType$resolveTy
-      : exeContext.typeResolver;
+  const resolveTypeFn = returnType.resolveType ?? exeContext.typeResolver;
   const contextValue = exeContext.contextValue;
   const runtimeType = resolveTypeFn(result, contextValue, info, returnType);
 
@@ -812,21 +787,27 @@ function ensureValidRuntimeType(
   if (runtimeType == null) {
     throw new GraphQLError(
       `Abstract type "${returnType.name}" was resolved to a type "${runtimeTypeName}" that does not exist inside the schema.`,
-      fieldNodes,
+      {
+        nodes: fieldNodes,
+      },
     );
   }
 
   if (!isObjectType(runtimeType)) {
     throw new GraphQLError(
       `Abstract type "${returnType.name}" was resolved to a non-object type "${runtimeTypeName}".`,
-      fieldNodes,
+      {
+        nodes: fieldNodes,
+      },
     );
   }
 
   if (!exeContext.schema.isSubType(returnType, runtimeType)) {
     throw new GraphQLError(
       `Runtime Object type "${runtimeType.name}" is not a possible type for "${returnType.name}".`,
-      fieldNodes,
+      {
+        nodes: fieldNodes,
+      },
     );
   }
 
@@ -879,7 +860,9 @@ function completeObjectValue(
 function invalidReturnTypeError(returnType, result, fieldNodes) {
   return new GraphQLError(
     `Expected value of type "${returnType.name}" but got: ${inspect(result)}.`,
-    fieldNodes,
+    {
+      nodes: fieldNodes,
+    },
   );
 }
 /**
